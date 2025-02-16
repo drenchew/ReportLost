@@ -27,7 +27,7 @@ interface RouteProps {
 const routeList: RouteProps[] = [
   { path: "/", label: "Home" },
   { path: "/report-lost", label: "Report Lost" },
-  { path: "/report-stolen", label: "Report Stolen" },
+  { path: "/report-found", label: "Report Found" },
 
   { path: "/#faq", label: "FAQ" },
 ];
