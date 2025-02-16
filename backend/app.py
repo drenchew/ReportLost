@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import json
 
 app = Flask(__name__)
 CORS(app)  # Allow requests from React frontend
@@ -13,6 +14,8 @@ def report_lost():
 
     # Example: Save data to a database (not implemented here)
     print("Received lost report:", data)
+
+
 
     return jsonify({"message": "Lost item reported successfully!"}), 201
 
