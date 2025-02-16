@@ -3,16 +3,32 @@ import axios from "axios";
 
 export const ReportLost: React.FC = () => {
   const [formData, setFormData] = useState({ item: "", description: "" });
+  const [image, setImage] = useState<File | null>(null);
   const [response, setResponse] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://127.0.0.1:5000/api/report-lost", formData);
+      const formDataToSend = new FormData();
+      formDataToSend.append("item", formData.item);
+      formDataToSend.append("description", formData.description);
+      if (image) {
+        formDataToSend.append("image", image);
+      }
+      
+      const res = await axios.post("http://127.0.0.1:5000/api/report-lost", formDataToSend, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       setResponse(res.data.message);
     } catch (error) {
       console.error("Error submitting form", error);
@@ -40,10 +56,15 @@ export const ReportLost: React.FC = () => {
           className="w-full p-2 border border-gray-300 rounded"
           required
         />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
         <button type="submit" className="w-full p-2 bg-green-500 text-white rounded">
           Submit
         </button>
-        
       </form>
       {response && <p className="mt-4 text-green-500">{response}</p>}
     </div>

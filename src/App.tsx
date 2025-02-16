@@ -8,6 +8,8 @@ import { Navbar } from "./components/Navbar";
 import { Newsletter } from "./components/Newsletter";
 
 import { ScrollToTop } from "./components/ScrollToTop";
+import { ReportFound } from "./components/ReportFound";
+
 
 import { Team } from "./components/Team";
 
@@ -35,6 +37,7 @@ function App() {
           </>
         } />
         <Route path="/report-lost" element={<ReportLost />} />
+        <Route path="/report-found" element={<ReportFound />} />
       </Routes>
       <Footer />
       <ScrollToTop />
