@@ -8,6 +8,7 @@ import { Navbar } from "./components/Navbar";
 import { Newsletter } from "./components/Newsletter";
 
 import { ScrollToTop } from "./components/ScrollToTop";
+
 import { ReportFound } from "./components/ReportFound";
 
 
@@ -26,12 +27,7 @@ function App() {
             <Hero />
             <About />
             <HowItWorks />
-      
-           
-           
-            
             <Team />
-            
             <Newsletter />
             
           </>
