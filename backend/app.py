@@ -24,7 +24,7 @@ try:
         raise Exception("MONGO_URI not loaded from environment variables.")
 
     client = MongoClient(uri, server_api=ServerApi('1'))
-    db = client["songRq"]
+    db = client["LostFound"]
 
     if not db:
         raise Exception("Failed to initialize the database.")
@@ -50,9 +50,9 @@ def home():
     return render_template('index.html')
 
 
-
+@app.route('/api/report-lost', methods=['POST'])
 def report_lost():
-    title = request.form.get("title")
+    title = request.form.get("item")
     description = request.form.get("description")
     image = request.files.get("image")  
 
@@ -72,14 +72,28 @@ def report_lost():
 
     return jsonify({"message": "Lost item reported successfully!", "id": str(report_id)}), 201
 
-@app.route('/api/report-found', methods=['POST'])
+@app.route('/api/report-found', methods=['GET'])
 def report_found():
-    data = request.json  
-    if not data:
-        return jsonify({"error": "Invalid data"}), 400  
+    data = list(lost_found_collection.find({}))
 
-    #llist images of the lost item
-    print("Received found report:", data)
+    if not data:
+        return jsonify([]), 200  # Return empty array instead of error
+
+    for item in data:
+        item["_id"] = str(item["_id"])  # Convert MongoDB ObjectId to string
+        item["imageUrl"] = f"http://127.0.0.1:5000/api/image/{item['image_id']}" if item.get("image_id") else None  # Generate image URL
+
+    return jsonify(data), 200
+
+# 🔹 Route to serve images from GridFS
+@app.route('/api/image/<image_id>', methods=['GET'])
+def get_image(image_id):
+    try:
+        image = fs.get(ObjectId(image_id))
+        return send_file(BytesIO(image.read()), mimetype="image/png")  # Adjust MIME type if needed
+    except Exception:
+        return jsonify({"error": "Image not found"}), 404
+        
 
 
 

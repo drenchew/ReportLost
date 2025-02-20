@@ -39,29 +39,30 @@ export const ReportLost: React.FC = () => {
     <div className="p-6 max-w-lg mx-auto">
       <h2 className="text-2xl font-bold mb-4">Report Lost Item</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="item"
-          placeholder="Item Name"
-          value={formData.item}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-        <textarea
-          name="description"
-          placeholder="Item Description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
+      <input
+  type="text"
+  name="item"
+  placeholder="Item Name"
+  value={formData.item}
+  onChange={handleChange}
+  className="w-full p-2 border border-gray-300 rounded text-black bg-white"
+  required
+/>
+<textarea
+  name="description"
+  placeholder="Item Description"
+  value={formData.description}
+  onChange={handleChange}
+  className="w-full p-2 border border-gray-300 rounded text-black bg-white"
+  required
+/>
+<input
+  type="file"
+  accept="image/*"
+  onChange={handleImageChange}
+  className="w-full p-2 border border-gray-300 rounded text-black bg-white"
+/>
+
         <button type="submit" className="w-full p-2 bg-green-500 text-white rounded">
           Submit
         </button>
