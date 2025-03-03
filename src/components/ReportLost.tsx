@@ -28,6 +28,7 @@ export const ReportLost: React.FC = () => {
       
       const res = await axios.post("http://127.0.0.1:5000/api/report-lost", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
       });
       setResponse(res.data.message);
     } catch (error) {

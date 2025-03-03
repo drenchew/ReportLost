@@ -28,6 +28,9 @@ const routeList: RouteProps[] = [
   { path: "/", label: "Home" },
   { path: "/report-lost", label: "Report Lost" },
   { path: "/report-found", label: "Report Found" },
+  {path: "/login", label: "Login"},
+  {path: "/register", label: "Register"},
+  {path: "/logout", label: "Logout"},
 
   { path: "/#faq", label: "FAQ" },
 ];
@@ -41,7 +44,7 @@ export const Navbar = () => {
           <NavigationMenuItem className="font-bold flex">
             <Link to="/" className="ml-2 font-bold text-xl flex">
               <LogoIcon />
-              ShadcnUI/React
+              FindMyStuff
             </Link>
           </NavigationMenuItem>
 
@@ -58,7 +61,7 @@ export const Navbar = () => {
 
               <SheetContent side={"left"}>
                 <SheetHeader>
-                  <SheetTitle className="font-bold text-xl">Shadcn/React</SheetTitle>
+                  <SheetTitle className="font-bold text-xl">FindMyStuff</SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col justify-center items-center gap-2 mt-4">
                   {routeList.map(({ path, label }: RouteProps) => (
@@ -71,15 +74,7 @@ export const Navbar = () => {
                       {label}
                     </Link>
                   ))}
-                  <a
-                    href="https://github.com/leoMirandaa/shadcn-landing-page.git"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`w-[110px] border ${buttonVariants({ variant: "secondary" })}`}
-                  >
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
-                    Github
-                  </a>
+                 
                 </nav>
               </SheetContent>
             </Sheet>

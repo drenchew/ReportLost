@@ -1,31 +1,36 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 // Named export for Login component
 export const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const navigate = useNavigate(); // React Router hook for navigation
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
+
     try {
-      // Sending login credentials with cookies (for session)
-      await axios.post(
+      const response = await axios.post(
         "http://127.0.0.1:5000/api/login",
         { username, password },
         { withCredentials: true }
       );
-      // Redirect to home or dashboard after successful login
-      window.location.href = "/home"; // Adjust this route based on your app's structure
-    } catch (err) {
-      setError("Invalid credentials. Please try again.");
+
+      console.log("Login success:", response.data);
+      navigate("/home"); // Redirect to home/dashboard
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Login failed. Try again.");
       console.error("Login error:", err);
     }
   };
 
   return (
-    <div className="p-6 max-w-sm mx-auto">
+    <div className="p-6 max-w-sm mx-auto text-white">
       <h2 className="text-2xl font-bold mb-4">Login</h2>
       {error && <div className="text-red-500">{error}</div>}
       <form onSubmit={handleLogin}>
@@ -33,11 +38,10 @@ export const Login: React.FC = () => {
           <label htmlFor="username" className="block">Username</label>
           <input
             id="username"
-            name = "username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-black"
             required
           />
         </div>
@@ -46,14 +50,13 @@ export const Login: React.FC = () => {
           <input
             id="password"
             type="password"
-            name = "password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-black"
             required
           />
         </div>
-        <button type="submit" className="bg-blue-500 text-white p-2 w-full">Login</button>
+        <Button type="submit" variant="default" className="w-full">Login</Button>
       </form>
       <p className="mt-4">
         Don't have an account? <a href="/register" className="text-blue-500">Register</a>
