@@ -57,7 +57,7 @@ function App() {
         <Route path="/report-found" element={user ? <ReportFound /> : <Navigate to="/login" />} />
 
         {/* Public Routes */}
-        <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <Login setUser={setUser} />} />
         <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
       </Routes>
 

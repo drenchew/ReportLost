@@ -102,6 +102,8 @@ def report_lost():
 
 @app.route('/api/report-found', methods=['GET'])
 def report_found():
+    if "username" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
     data = list(lost_found_collection.find({}))
     if not data:
         return jsonify([]), 200  
@@ -178,10 +180,8 @@ def login():
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    if "username" not in session:
-        
-        return redirect(url_for('login'))
-    session.pop("username", None)  
+    session.clear()
+    return jsonify({"message": "Logged out successfully"}), 200
     return jsonify({"message": "Logged out successfully"}), 200
 
 @app.route('/api/session', methods=['GET'])
