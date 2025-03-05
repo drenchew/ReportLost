@@ -9,6 +9,8 @@ import os
 from io import BytesIO
 from datetime import timedelta
 
+from flask_session import Session
+import redis
 
 
 
@@ -27,8 +29,7 @@ try:
     client = MongoClient(uri, server_api=ServerApi('1'))
     db = client["LostFound"]
 
-    if not db:
-        raise Exception("Failed to initialize the database.")
+   
 
     lost_found_collection = db.lost_found
     credentials_collection = db.credentials
@@ -40,7 +41,7 @@ except Exception as e:
     print(f"Error: Database connection failed: {e}")
     client = None  
 
-# Flask App
+
 app = Flask(__name__)
 app.secret_key = secret_key
 
@@ -49,11 +50,14 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 
 
 
-app.config["SESSION_COOKIE_NAME"] = "session_id"
-app.config["SESSION_COOKIE_HTTPONLY"] = True  
-app.config["SESSION_COOKIE_SECURE"] = False   #true for https
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=1)
+app.config["SESSION_TYPE"] = "redis"
+app.config["SESSION_PERMANENT"] = False  
+app.config["SESSION_USE_SIGNER"] = True  
+app.config["SESSION_KEY_PREFIX"] = "flask-session:"  
+app.config["SESSION_REDIS"] = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+
+Session(app)
 
 CORS(app, supports_credentials=True) 
 
@@ -64,12 +68,15 @@ CORS(app, supports_credentials=True)
 def home():
     return render_template('index.html')
 
+
+
 @app.route('/api/report-lost', methods=['POST', 'GET'])
 def report_lost():
     if request.method == 'GET':
         return jsonify({"message": "Log in to report lost item"}), 200
 
-  
+    if "username" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
     
     user = session["username"]
     title = request.form.get("item")
@@ -95,6 +102,8 @@ def report_lost():
 
 @app.route('/api/report-found', methods=['GET'])
 def report_found():
+    if "username" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
     data = list(lost_found_collection.find({}))
     if not data:
         return jsonify([]), 200  
@@ -115,7 +124,7 @@ def get_image(image_id):
 
 @app.route('/api/delete/<id>', methods=['DELETE'])
 def delete_post(id):
-    session["username"] = "Aadmin"
+    
     if "username" not in session:
         return jsonify({"error": "Unauthorized"}), 401 
     
@@ -150,6 +159,7 @@ def register():
 
 @app.route('/api/login', methods=['POST'])
 def login():
+
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
@@ -164,13 +174,14 @@ def login():
     if not bcrypt.checkpw(password.encode("utf-8"), user["password"]):
         return jsonify({"error": "Invalid credentials"}), 401
 
-    session.permanent = True
+
     session['username'] = username  
     return jsonify({"message": "Login successful!"}), 200
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    session.pop("username", None)  
+    session.clear()
+    return jsonify({"message": "Logged out successfully"}), 200
     return jsonify({"message": "Logged out successfully"}), 200
 
 @app.route('/api/session', methods=['GET'])

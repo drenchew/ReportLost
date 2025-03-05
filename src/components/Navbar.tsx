@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -28,20 +29,32 @@ const routeList: RouteProps[] = [
   { path: "/", label: "Home" },
   { path: "/report-lost", label: "Report Lost" },
   { path: "/report-found", label: "Report Found" },
-
-  { path: "/#faq", label: "FAQ" },
+  { path: "/login", label: "Login" },
+  { path: "/register", label: "Register" },
+  { path: "/#faq", label: "FAQ" }, // Removed "/logout" from the route list
 ];
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const navigate = useNavigate(); // 👈 Hook for redirecting after logout
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://127.0.0.1:5000/api/logout", {}, { withCredentials: true });
+      navigate("/login"); // ✅ Redirects to login after logout
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   return (
-    <header className="sticky border-b-[1px] top-0 z-40 w-full bg-white dark:border-b-slate-700 dark:bg-background">
+    <header className="sticky top-0 z-40 w-full bg-white dark:bg-background border-b">
       <NavigationMenu className="mx-auto">
-        <NavigationMenuList className="container h-14 px-4 w-screen flex justify-between">
-          <NavigationMenuItem className="font-bold flex">
-            <Link to="/" className="ml-2 font-bold text-xl flex">
+        <NavigationMenuList className="container flex justify-between h-14 px-4">
+          <NavigationMenuItem>
+            <Link to="/" className="font-bold text-xl flex">
               <LogoIcon />
-              ShadcnUI/React
+              FindMyStuff
             </Link>
           </NavigationMenuItem>
 
@@ -58,10 +71,10 @@ export const Navbar = () => {
 
               <SheetContent side={"left"}>
                 <SheetHeader>
-                  <SheetTitle className="font-bold text-xl">Shadcn/React</SheetTitle>
+                  <SheetTitle className="font-bold text-xl">FindMyStuff</SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col justify-center items-center gap-2 mt-4">
-                  {routeList.map(({ path, label }: RouteProps) => (
+                  {routeList.map(({ path, label }) => (
                     <Link
                       key={label}
                       to={path}
@@ -71,15 +84,16 @@ export const Navbar = () => {
                       {label}
                     </Link>
                   ))}
-                  <a
-                    href="https://github.com/leoMirandaa/shadcn-landing-page.git"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`w-[110px] border ${buttonVariants({ variant: "secondary" })}`}
+                  {/* Logout Button */}
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      handleLogout();
+                    }}
+                    className={buttonVariants({ variant: "ghost" })}
                   >
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
-                    Github
-                  </a>
+                    Logout
+                  </button>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -87,11 +101,15 @@ export const Navbar = () => {
 
           {/* Desktop Menu */}
           <nav className="hidden md:flex gap-2">
-            {routeList.map(({ path, label }: RouteProps, i) => (
-              <Link key={i} to={path} className={`text-[17px] ${buttonVariants({ variant: "ghost" })}`}>
+            {routeList.map(({ path, label }) => (
+              <Link key={path} to={path} className={buttonVariants({ variant: "ghost" })}>
                 {label}
               </Link>
             ))}
+            {/* Logout Button */}
+            <button onClick={handleLogout} className={buttonVariants({ variant: "ghost" })}>
+              Logout
+            </button>
           </nav>
 
           <div className="hidden md:flex gap-2">
@@ -104,7 +122,6 @@ export const Navbar = () => {
               <GitHubLogoIcon className="mr-2 w-5 h-5" />
               Github
             </a>
-
             <ModeToggle />
           </div>
         </NavigationMenuList>
